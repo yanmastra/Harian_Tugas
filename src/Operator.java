@@ -1,15 +1,19 @@
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.sql.Connection;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 
@@ -20,6 +24,8 @@ import javax.swing.JTextArea;
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -34,9 +40,13 @@ public class Operator extends JFrame {
 	private JTextArea txtAlamat;
 	private JDateChooser dcTglLahir;
 	private JButton btnSimpan;
+	private JRadioButton rdbtnLakilaki;
+	private JRadioButton rdbtnPerempuan;
+	private JLabel lblUlangiPassword;
 	
 	private Koneksi koneksi = new Koneksi();
 	private Connection con = koneksi.getConnection();
+	private boolean modeSimpan = true;
 
 	/**
 	 * Launch the application.
@@ -57,6 +67,35 @@ public class Operator extends JFrame {
 	/**
 	 * Create the frame.
 	 */
+	public Operator(String args){
+		this();
+		ResultSet rs;
+		try{
+			PreparedStatement ps = con.prepareStatement("SELECT * FROM operator WHERE id_operator = ?");
+			ps.setString(1, args);
+			rs = ps.executeQuery();
+			rs.beforeFirst();
+			while(rs.next()){
+				txtKode.setText(args);
+				txtKode.setEditable(false);
+				txtPassword.setEditable(false);
+				lblUlangiPassword.setText("Password Lama");
+				txtNama.setText(rs.getString(3));
+				txtAlamat.setText(rs.getString(4));
+				dcTglLahir.setDate(rs.getDate(5));
+				if(rs.getString(6).equals("Laki-laki")){
+					rdbtnLakilaki.setSelected(true);
+				}else{
+					rdbtnPerempuan.setSelected(true);
+				}
+			}
+			rs.close();
+			ps.close();
+		}catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
 	public Operator() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 350, 420);
@@ -96,7 +135,7 @@ public class Operator extends JFrame {
 		txtPassword.setBounds(116, 160, 160, 20);
 		contentPane.add(txtPassword);
 		
-		JLabel lblUlangiPassword = new JLabel("Ulangi Password");
+		lblUlangiPassword = new JLabel("Ulangi Password");
 		lblUlangiPassword.setBounds(10, 185, 100, 14);
 		contentPane.add(lblUlangiPassword);
 		
@@ -117,12 +156,12 @@ public class Operator extends JFrame {
 		lblJenisKelamin.setBounds(10, 260, 100, 14);
 		contentPane.add(lblJenisKelamin);
 		
-		JRadioButton rdbtnLakilaki = new JRadioButton("Laki-laki");
+		rdbtnLakilaki = new JRadioButton("Laki-laki");
 		jenisKelaminGroup.add(rdbtnLakilaki);
 		rdbtnLakilaki.setBounds(116, 260, 76, 23);
 		contentPane.add(rdbtnLakilaki);
 		
-		JRadioButton rdbtnPerempuan = new JRadioButton("Perempuan");
+		rdbtnPerempuan = new JRadioButton("Perempuan");
 		jenisKelaminGroup.add(rdbtnPerempuan);
 		rdbtnPerempuan.setBounds(194, 260, 106, 23);
 		contentPane.add(rdbtnPerempuan);
@@ -136,9 +175,10 @@ public class Operator extends JFrame {
 		btnSimpan = new JButton("Simpan");
 		btnSimpan.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				String sql = "";
+				PreparedStatement ps;
+				sql = "INSERT INTO operator VALUES (?, MD5(?), ?, ?, ?, ?)";
 				if(String.valueOf(txtPassword.getPassword()).equals(String.valueOf(txtUlangiPassword.getPassword()))){
-					PreparedStatement ps;
-					String sql = "INSERT INTO operator VALUES (?,MD5(?),?,?,?,?)";
 					try{
 						ps = con.prepareStatement(sql);
 						ps.setString(1, txtKode.getText());
@@ -155,11 +195,19 @@ public class Operator extends JFrame {
 						int hasil = ps.executeUpdate();
 						if(hasil>0){
 							JOptionPane.showMessageDialog(null, "Data berhasil disimpan!");
+							txtKode.setText("");
+							txtPassword.setText("");
+							txtUlangiPassword.setText("");
+							txtNama.setText("");
+							txtAlamat.setText("");
+							dcTglLahir.setDate(null);
+							rdbtnLakilaki.setSelected(false);
+							rdbtnPerempuan.setSelected(false);
 						}else{
 							JOptionPane.showMessageDialog(null, "Data GAGAL disimpan!");
 						}
 					}catch(SQLException e){
-						e.printStackTrace();
+						JOptionPane.showMessageDialog(null, e.getMessage());
 					}
 				}else{
 					JOptionPane.showMessageDialog(null, "Password tidak sama!");
@@ -180,4 +228,8 @@ public class Operator extends JFrame {
 		contentPane.add(txtPassError);
 		
 	}
+	
+	//public Operator(){
+		
+	//}
 }
