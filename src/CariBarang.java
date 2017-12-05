@@ -89,6 +89,7 @@ public class CariBarang extends JFrame {
 					cbMode.addElement("Semua Kategori");
 					Id_jenis[i] = 999;
 					cbJenis.setModel(cbMode);
+					cbJenis.setSelectedIndex(i);
 				}catch(SQLException e){
 					e.printStackTrace();
 				}
@@ -137,12 +138,10 @@ public class CariBarang extends JFrame {
 				}
 			}
 		});
-		txtHarga1.setColumns(10);
 		txtHarga1.setBounds(130, 68, 86, 20);
 		contentPane.add(txtHarga1);
 		
 		txtHarga2 = new JTextField();
-		txtHarga2.setColumns(10);
 		txtHarga2.setBounds(239, 68, 86, 20);
 		contentPane.add(txtHarga2);
 		txtHarga2.addKeyListener(new KeyAdapter() {
@@ -175,7 +174,7 @@ public class CariBarang extends JFrame {
 				else
 					getData("barang.jenis_barang = '"+Id_jenis[cbJenis.getSelectedIndex()]+"'");
 			}
-		});;
+		});
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(10, 124, 414, 176);
@@ -226,7 +225,7 @@ public class CariBarang extends JFrame {
 			}
 			rs.close();
 		}catch(SQLException e){
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, e.getMessage());
 		}
 	}
 }
