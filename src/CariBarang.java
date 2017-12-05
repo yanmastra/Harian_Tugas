@@ -16,6 +16,8 @@ import javax.swing.JButton;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputMethodEvent;
+import java.awt.event.InputMethodListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.Connection;
@@ -24,11 +26,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.Color;
 
 public class CariBarang extends JFrame {
 
 	private JPanel contentPane;
-	private JTextField textField;
+	private JTextField txtNamaBarang;
 	private JLabel lblHarga;
 	private JTextField txtHarga1;
 	private JTextField txtHarga2;
@@ -37,6 +42,7 @@ public class CariBarang extends JFrame {
 	private JTable table;
 	private JComboBox cbJenis;
 	private int[] Id_jenis;
+	private JLabel lblResult;
 	
 	Koneksi koneksi = new Koneksi();
 	Connection con = koneksi.getConnection();
@@ -97,10 +103,20 @@ public class CariBarang extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		textField = new JTextField();
-		textField.setBounds(130, 40, 195, 20);
-		contentPane.add(textField);
-		textField.setColumns(10);
+		txtNamaBarang = new JTextField();
+		txtNamaBarang.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				//if() System.out.println("true");
+				//else System.out.println("false");
+				//System.out.println(arg0.getKeyCode()+"");
+				getData("nama_barang LIKE '%"+txtNamaBarang.getText()+"%'");
+				//System.out.println("if bernilai true");
+			}
+		});
+		txtNamaBarang.setBounds(130, 40, 195, 20);
+		contentPane.add(txtNamaBarang);
+		txtNamaBarang.setColumns(10);
 		
 		JLabel lblNamaBarang = new JLabel("Nama Barang");
 		lblNamaBarang.setBounds(10, 43, 110, 14);
@@ -111,6 +127,16 @@ public class CariBarang extends JFrame {
 		contentPane.add(lblHarga);
 		
 		txtHarga1 = new JTextField();
+		txtHarga1.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				if(!txtHarga2.getText().equals("") && !txtHarga1.getText().equals("")){
+					getData("harga_barang BETWEEN "+txtHarga1.getText()+" AND "+txtHarga2.getText());
+				}else{
+					getData("1");
+				}
+			}
+		});
 		txtHarga1.setColumns(10);
 		txtHarga1.setBounds(130, 68, 86, 20);
 		contentPane.add(txtHarga1);
@@ -119,6 +145,16 @@ public class CariBarang extends JFrame {
 		txtHarga2.setColumns(10);
 		txtHarga2.setBounds(239, 68, 86, 20);
 		contentPane.add(txtHarga2);
+		txtHarga2.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				if(!txtHarga2.getText().equals("") && !txtHarga1.getText().equals("")){
+					getData("harga_barang BETWEEN "+txtHarga1.getText()+" AND "+txtHarga2.getText());
+				}else{
+					getData("1");
+				}
+			}
+		});
 		
 		lblTo = new JLabel("to");
 		lblTo.setBounds(219, 71, 17, 14);
@@ -148,6 +184,11 @@ public class CariBarang extends JFrame {
 		table = new JTable();
 		scrollPane.setViewportView(table);
 		table.setModel(tbModel);
+		
+		lblResult = new JLabel("");
+		lblResult.setForeground(Color.RED);
+		lblResult.setBounds(274, 96, 150, 14);
+		contentPane.add(lblResult);
 	}
 
 	private void getData(String whereClause){
@@ -176,11 +217,13 @@ public class CariBarang extends JFrame {
 				tbModel.addRow(obj);
 			}
 			rs.last();
-			if(rs.getRow()<=0){ 
-				JOptionPane.showMessageDialog(null, "Data tidak ditemukan.");
+			if(rs.getRow()<=0){
 				getData("1");
+				lblResult.setText("Data tidak ditemukan!");
+			}else{
+				table.setModel(tbModel);
+				lblResult.setText("");
 			}
-			table.setModel(tbModel);
 			rs.close();
 		}catch(SQLException e){
 			e.printStackTrace();
