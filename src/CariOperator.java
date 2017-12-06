@@ -6,12 +6,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.JTextField;
 
@@ -38,6 +40,8 @@ public class CariOperator extends JFrame {
 	private JTable table;
 	private JDateChooser dcTglLahir1;
 	private JDateChooser dcTglLahir2;
+	private JRadioButton rbPrempuan, rbLaki;
+	private JButton btnCari;
 	
 	String[] header = {"ID", "Nama", "Alamat", "Tgl Lahir", "Jenis Kelamin"};
 	private DefaultTableModel tbModel = new DefaultTableModel(null, header);
@@ -126,7 +130,7 @@ public class CariOperator extends JFrame {
 		label.setBounds(10, 80, 100, 20);
 		contentPane.add(label);
 		
-		JRadioButton rbLaki = new JRadioButton("Laki-laki");
+		rbLaki = new JRadioButton("Laki-laki");
 		rbLaki.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				PreparedStatement ps;
@@ -144,7 +148,7 @@ public class CariOperator extends JFrame {
 		rbLaki.setBounds(120, 80, 100, 20);
 		contentPane.add(rbLaki);
 		
-		JRadioButton rbPrempuan = new JRadioButton("Perempuan");
+		rbPrempuan = new JRadioButton("Perempuan");
 		rbPrempuan.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -163,8 +167,30 @@ public class CariOperator extends JFrame {
 		rbPrempuan.setBounds(230, 80, 100, 20);
 		contentPane.add(rbPrempuan);
 		
-		JButton btnCari = new JButton("Cari");
-		btnCari.setBounds(360, 80, 80, 20);
+		btnCari = new JButton("Cari");
+		btnCari.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if(dcTglLahir1.getDate() ==null || dcTglLahir2.getDate() == null){
+					JOptionPane.showMessageDialog(null,"Salah satu atau kedua field tanggal tidak boleh kosong");
+				}else if(Duration.between(dcTglLahir1.getDate().toInstant(), dcTglLahir2.getDate().toInstant()).isNegative()){
+					JOptionPane.showMessageDialog(null, "Rentang tanggal salah");
+				}else{
+					SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd");
+					PreparedStatement ps;
+					String sql = "SELECT * FROM operator WHERE tgl_lahir BETWEEN ? AND ?";
+					
+					try{
+						ps = con.prepareStatement(sql);
+						ps.setString(1, formater.format(dcTglLahir1.getDate()));
+						ps.setString(2, formater.format(dcTglLahir2.getDate()));
+						getData(ps);
+					}catch(SQLException e){
+						e.printStackTrace();
+					}
+				}
+			}
+		});
+		btnCari.setBounds(350, 55, 80, 20);
 		contentPane.add(btnCari);
 		
 		JScrollPane scrollPane = new JScrollPane();
