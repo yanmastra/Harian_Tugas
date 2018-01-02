@@ -349,6 +349,7 @@ public class Barang extends JFrame {
 			Statement st = con.createStatement();
 			rs = st.executeQuery(sql);
 			tbModel.getDataVector().removeAllElements();
+			tbModel.fireTableDataChanged();
 			rs.beforeFirst();
 			while(rs.next()){
 				Object obj[] = new Object[6];
