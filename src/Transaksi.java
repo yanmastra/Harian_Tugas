@@ -45,6 +45,16 @@ public class Transaksi extends JFrame {
 	private JLabel lblBayar;
 	private JTextField txtKembali;
 	private JLabel lblKembali;
+	
+	private String bla;
+
+	public String getBla() {
+		return bla;
+	}
+
+	public void setBla(String bla) {
+		this.bla = bla;
+	}
 
 	/**
 	 * Launch the application.
@@ -67,7 +77,7 @@ public class Transaksi extends JFrame {
 	 */
 	public Transaksi() {
 		setTitle("Frame Transaksi");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 455, 350);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -294,11 +304,11 @@ public class Transaksi extends JFrame {
 							res = ps.executeUpdate();
 							if(res>0) {
 								System.out.println("Insert detail transaksi berhasil "+i);
-								Statement st = con.createStatement();
-								int hasil = st.executeUpdate("UPDATE barang SET stock_barang = stock_barang -"+tbModel.getValueAt(i, 3));
-								if(hasil>0) { 
-									System.out.println("Update stok barang berhasil");
-								}else System.out.println("Update stok barang GAGAL");
+//								Statement st = con.createStatement();
+//								int hasil = st.executeUpdate("UPDATE barang SET stock_barang = stock_barang -"+tbModel.getValueAt(i, 3)+" WHERE kode_barang = '"+tbModel.getValueAt(i, 0));
+//								if(hasil>0) { 
+//									System.out.println("Update stok barang berhasil");
+//								}else System.out.println("Update stok barang GAGAL");
 							}else {
 								System.out.println("Insert ddetail transaksi GAGAL");
 							}
@@ -320,5 +330,12 @@ public class Transaksi extends JFrame {
 				}
 			}
 		});
+	}
+	
+	public void setOperator(String id, String nama) {
+		txtNoPegawai.setText(id);
+		txtNamaPegawai.setText(nama);
+		txtNoPegawai.setEnabled(false);
+		txtKode.requestFocus();
 	}
 }

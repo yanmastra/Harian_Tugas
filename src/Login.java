@@ -86,11 +86,14 @@ public class Login extends JFrame {
 					ps.setString(1, username.getText());
 					ps.setString(2, String.valueOf(password.getPassword()));
 					ResultSet rs = ps.executeQuery();
-					rs.last();
-					if(rs.getRow()>0) {
+					if(rs.next()) {
 						JOptionPane.showMessageDialog(null, "Login berhasil");
-						frame = new Operator();
-						frame.setVisible(true);
+						Home frHome = new Home();
+						frHome.setVisible(true);
+						frHome.setIdOperator(rs.getString(1));
+						frHome.setNamaOperator(rs.getString(3));
+						frHome.setExtendedState(JFrame.MAXIMIZED_BOTH);
+						setVisible(false);
 					}else {
 						JOptionPane.showMessageDialog(null, "Login gagal");
 					}

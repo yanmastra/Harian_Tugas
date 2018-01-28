@@ -1,5 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.Frame;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -8,11 +9,22 @@ import javax.swing.JButton;
 import javax.swing.JTextField;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import javax.swing.JLabel;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class Home extends JFrame {
 
 	private JPanel contentPane;
-	private JTextField textField;
+	
+	//operator;
+	private String idOperator = "";
+	private String namaOperator = "";
+	
+	private JenisBarang frJenis;
 
 	/**
 	 * Launch the application.
@@ -21,9 +33,9 @@ public class Home extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Home frame = new Home();
+					Frame frame = new Home();
 					frame.setVisible(true);
-				} catch (Exception e) {
+				}catch(Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -35,26 +47,57 @@ public class Home extends JFrame {
 	 */
 	public Home() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 660, 430);
+		
+		JMenuBar menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
+		
+		JMenu mnDataMaster = new JMenu("Data Master");
+		menuBar.add(mnDataMaster);
+		
+		JMenuItem mntmKategori = new JMenuItem("Kategori");
+		mntmKategori.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				frJenis = new JenisBarang();
+				frJenis.setVisible(true);
+			}
+		});
+		mnDataMaster.add(mntmKategori);
+		
+		JMenu mnDataBarang = new JMenu("Data Barang");
+		mnDataMaster.add(mnDataBarang);
+		
+		JMenuItem mntmTambahBarang = new JMenuItem("Tambah Barang");
+		mnDataBarang.add(mntmTambahBarang);
+		
+		JMenu mnOperator = new JMenu("Operator");
+		mnDataMaster.add(mnOperator);
+		
+		JMenu mnTransaksi = new JMenu("Transaksi");
+		menuBar.add(mnTransaksi);
+		
+		JMenuItem mntmTransasksi = new JMenuItem("Transaski");
+		mnTransaksi.add(mntmTransasksi);
+		mntmTransasksi.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				Transaksi transaksi = new Transaksi();
+				transaksi.setOperator(idOperator, namaOperator);
+				transaksi.setVisible(true);
+			}
+		});
+		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		
-		JButton btnLogin = new JButton("Login");
-		btnLogin.setBounds(10, 11, 89, 23);
-		contentPane.add(btnLogin);
-		
-		textField = new JTextField();
-		textField.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyReleased(KeyEvent arg0) {
-				System.out.println(arg0.getKeyCode());
-			}
-		});
-		textField.setBounds(128, 12, 86, 20);
-		contentPane.add(textField);
-		textField.setColumns(10);
 	}
-
+	
+	public void setIdOperator(String id) {
+		this.idOperator = id;
+	}
+	
+	public void setNamaOperator(String nama) {
+		this.namaOperator = nama;
+	}
 }
